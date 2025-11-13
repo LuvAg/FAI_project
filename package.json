@@ -1,0 +1,23 @@
+{
+  "name": "csp-visualizer",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Interactive CSP solver visualization tool (VisuAlgo/AI-Space style)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "lint": "eslint js/**/*.js"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "eslint": "^8.54.0"
+  },
+  "keywords": ["csp", "constraint-satisfaction", "visualization", "ai", "algorithm"],
+  "author": "",
+  "license": "MIT"
+}

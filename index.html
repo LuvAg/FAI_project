@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CSP Visualizer — AI-Space / VisuAlgo style</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>🧩 CSP Visualizer</h1>
+    <div class="controls">
+      <label>Problem:
+        <select id="problemSelect">
+          <option value="map">Australia Map</option>
+          <option value="simple">Simple CSP</option>
+          <option value="4queens">4-Queens</option>
+          <option value="sudoku">4x4 Sudoku</option>
+        </select>
+      </label>
+      <label>Algorithm:
+        <select id="algoSelect">
+          <option value="bt">Backtracking</option>
+          <option value="bt-fc">BT + Forward Checking</option>
+          <option value="bt-ac3">BT + AC-3</option>
+        </select>
+      </label>
+      <label>Variable:
+        <select id="varHeuristic">
+          <option value="MRV">MRV (Min Remaining)</option>
+          <option value="none">Sequential</option>
+        </select>
+      </label>
+      <label>Value:
+        <select id="valHeuristic">
+          <option value="LCV">LCV (Least Constraining)</option>
+          <option value="none">Sequential</option>
+        </select>
+      </label>
+    </div>
+    <div class="controls">
+      <button id="resetBtn">Reset</button>
+      <button id="stepBackBtn">◀ Step Back</button>
+      <button id="stepBtn">Step ▶</button>
+      <button id="runBtn">▶▶ Run</button>
+      <button id="pauseBtn">⏸ Pause</button>
+      <label>Speed: <input id="speed" type="range" min="10" max="1000" step="10" value="200"> <span id="speedVal">200ms</span></label>
+    </div>
+  </header>
+
+  <main>
+    <section class="canvas-wrap">
+      <div class="info-bar">
+        <div id="puzzleInfo"></div>
+        <div id="statusInfo"></div>
+      </div>
+      <svg id="canvas" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet"></svg>
+    </section>
+
+    <aside class="current-domains-panel">
+      <h3>Current Domains</h3>
+      <div id="currentDomains" class="scroll-area"></div>
+    </aside>
+
+    <aside class="panel">
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="state">State</button>
+        <button class="tab-btn" data-tab="inspector">Inspector</button>
+        <button class="tab-btn" data-tab="trace">Trace</button>
+      </div>
+
+      <div class="tab-content active" data-tab="state">
+        <h3>Original Domains</h3>
+        <div id="domains" class="scroll-area"></div>
+
+        <h3>Propagation Queue</h3>
+        <div id="queue" class="scroll-area small"></div>
+
+        <h3>Assignment Stack</h3>
+        <div id="stack" class="scroll-area small"></div>
+      </div>
+
+      <div class="tab-content" data-tab="inspector">
+        <h3>Variable Inspector</h3>
+        <select id="inspectorVar">
+          <option value="">Select variable...</option>
+        </select>
+        <div id="inspectorContent" class="scroll-area"></div>
+      </div>
+
+      <div class="tab-content" data-tab="trace">
+        <h3>Event Timeline</h3>
+        <div id="timeline" class="scroll-area"></div>
+        <h3>Log</h3>
+        <div id="log" class="log scroll-area"></div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <div id="stepDescription" class="step-description">
+      <strong>Current Step:</strong> <span id="stepDescText">No action yet</span>
+    </div>
+    <div id="currentState" class="current-state">
+      <strong>Current State:</strong> <span id="stateDisplay">No assignments yet</span>
+    </div>
+    <small>Interactive CSP visualizer — AC-3, Forward Checking, Backtracking with MRV/LCV heuristics. <a href="https://github.com" target="_blank">GitHub</a></small>
+  </footer>
+
+  <script type="module" src="js/ui.js"></script>
+</body>
+</html>

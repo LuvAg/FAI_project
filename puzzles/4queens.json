@@ -1,0 +1,19 @@
+{
+  "name": "4-Queens Problem",
+  "type": "grid",
+  "description": "Place 4 queens on a 4x4 chessboard so no two queens attack each other",
+  "variables": [
+    {"name": "Q0", "domain": [0, 1, 2, 3], "position": {"x": 100, "y": 100}},
+    {"name": "Q1", "domain": [0, 1, 2, 3], "position": {"x": 200, "y": 100}},
+    {"name": "Q2", "domain": [0, 1, 2, 3], "position": {"x": 300, "y": 100}},
+    {"name": "Q3", "domain": [0, 1, 2, 3], "position": {"x": 400, "y": 100}}
+  ],
+  "constraints": [
+    {"xi": "Q0", "xj": "Q1", "type": "neq", "label": "no attack"},
+    {"xi": "Q0", "xj": "Q2", "type": "neq", "label": "no attack"},
+    {"xi": "Q0", "xj": "Q3", "type": "neq", "label": "no attack"},
+    {"xi": "Q1", "xj": "Q2", "type": "neq", "label": "no attack"},
+    {"xi": "Q1", "xj": "Q3", "type": "neq", "label": "no attack"},
+    {"xi": "Q2", "xj": "Q3", "type": "neq", "label": "no attack"}
+  ]
+}
