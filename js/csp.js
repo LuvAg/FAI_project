@@ -226,6 +226,7 @@ export class CSP{
           assignment.delete(name);
           stack.push({type:'unassign',var:name});
           this.emit('unassign', {var:name,assignment:cloneMap(assignment)});
+          await wait(options.sleep);
           continue;
         }
 
@@ -243,6 +244,7 @@ export class CSP{
             assignment.delete(name);
             stack.push({type:'unassign',var:name});
             this.emit('unassign', {var:name,assignment:cloneMap(assignment)});
+            await wait(options.sleep);
             continue;
           }
         } else if(options.inference==='FC'){
@@ -274,6 +276,7 @@ export class CSP{
             assignment.delete(name);
             stack.push({type:'unassign',var:name});
             this.emit('unassign', {var:name,assignment:cloneMap(assignment)});
+            await wait(options.sleep);
             continue;
           }
         }

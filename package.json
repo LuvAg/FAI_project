@@ -12,12 +12,19 @@
     "lint": "eslint js/**/*.js"
   },
   "devDependencies": {
-    "vite": "^5.0.0",
-    "vitest": "^1.0.0",
     "@vitest/ui": "^1.0.0",
-    "eslint": "^8.54.0"
+    "eslint": "^8.54.0",
+    "jsdom": "^27.2.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
   },
-  "keywords": ["csp", "constraint-satisfaction", "visualization", "ai", "algorithm"],
+  "keywords": [
+    "csp",
+    "constraint-satisfaction",
+    "visualization",
+    "ai",
+    "algorithm"
+  ],
   "author": "",
   "license": "MIT"
 }

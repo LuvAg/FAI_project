@@ -277,20 +277,26 @@ async function performSingleStep(){
     return {solved: true};
   }
   
-  // If we just backtracked, prioritize trying the backtracked variable first
+  // If we have a current variable that still has untried values, stick with it
   let varName, varr;
-  if(searchState.lastBacktracked && !searchState.assignment.has(searchState.lastBacktracked)){
+  if(searchState.currentVariable && !searchState.assignment.has(searchState.currentVariable)){
+    // Continue with current variable
+    varName = searchState.currentVariable;
+    varr = csp.variables.find(v => v.name === varName);
+  } else if(searchState.lastBacktracked && !searchState.assignment.has(searchState.lastBacktracked)){
+    // Use the backtracked variable
     varName = searchState.lastBacktracked;
     varr = csp.variables.find(v => v.name === varName);
-    searchState.lastBacktracked = null; // Clear the flag
+    searchState.currentVariable = varName; // Set as current
   } else {
-    // Select variable using heuristic
+    // Select new variable using heuristic
     if(varH === 'MRV'){
       unassigned.sort((a,b) => searchState.domains.get(a.name).length - searchState.domains.get(b.name).length);
     }
     
     varr = unassigned[0];
     varName = varr.name;
+    searchState.currentVariable = varName; // Set as current
   }
   
   const domain = searchState.domains.get(varName);
@@ -301,6 +307,13 @@ async function performSingleStep(){
   
   // If current variable has no untried values left, need to backtrack to previous variable
   if(availableValues.length === 0){
+    // Clear tried values for current variable since we're abandoning it
+    searchState.triedValues.set(varName, new Set());
+    
+    // Clear current variable and lastBacktracked since we're exhausting this variable
+    searchState.currentVariable = null;
+    searchState.lastBacktracked = null;
+    
     // Find last assigned variable to backtrack to
     const assignedVars = Array.from(searchState.assignment.keys());
     if(assignedVars.length === 0){
@@ -316,10 +329,10 @@ async function performSingleStep(){
     // Mark this value as tried for the backtrack variable
     searchState.triedValues.get(backtrackVar).add(backtrackValue);
     
-    // Clear tried values for all OTHER unassigned variables
+    // Clear tried values for all OTHER unassigned variables EXCEPT the one we just abandoned
     // (they will be re-explored with the new assignment)
     for(const v of csp.variables){
-      if(v.name !== backtrackVar && !searchState.assignment.has(v.name)){
+      if(v.name !== backtrackVar && v.name !== varName && !searchState.assignment.has(v.name)){
         searchState.triedValues.set(v.name, new Set());
       }
     }
@@ -453,23 +466,35 @@ async function performSingleStep(){
   }
   
   if(!consistent){
-    // Backtrack immediately - unassign and remove this value from domain
+    // Backtrack immediately - unassign and remove this value from assignment
     searchState.assignment.delete(varName);
     // Note: value is already marked as tried, so it won't be retried
-    
+
+    // Restore domains to state before the attempted assignment so remaining
+    // domain values for this variable are still available to try.
+    // We saved the pre-assignment domains in `snapshot` above.
+    if(snapshot && snapshot.domains){
+      searchState.domains = cloneMapDeep(snapshot.domains);
+      // Update visible CSP variable domains for display
+      for(const v of csp.variables){
+        if(searchState.domains.has(v.name)) v.domain = Array.from(searchState.domains.get(v.name));
+      }
+    }
+
     // Create snapshot after backtrack
     const backtrackSnapshot = {
       domains: cloneMapDeep(searchState.domains),
       assignment: cloneMap(searchState.assignment)
     };
-    
+
     const backtrackDesc = `Rejected ${varName} = ${value} (conflicts with ${violatedNeighbor}), trying next value`;
     updateStepDescription(backtrackDesc);
     addEvent('backtrack', {var: varName, value, snapshot: backtrackSnapshot, description: backtrackDesc});
-    
-    // Continue trying this variable on the next step
-    searchState.lastBacktracked = varName;
-    
+
+    // Emit unassign to pop from stack display
+    csp.emit('unassign', {var: varName, assignment: searchState.assignment});
+
+    // Keep currentVariable set so we continue trying this variable on the next step
     return {solved: false, failed: false};
   }
   
@@ -669,7 +694,8 @@ async function stepForward(){
       varIndex: 0,
       valueIndex: 0,
       finished: false,
-      lastBacktracked: null  // Track last backtracked variable
+      lastBacktracked: null,  // Track last backtracked variable
+      currentVariable: null   // Track which variable we're currently trying to assign
     };
     // Initialize triedValues for all variables
     for(const v of csp.variables){
